@@ -1,8 +1,4 @@
 # Document-Intelligence-System
-A Retrieval-Augmented Generation (RAG) system that enables natural language querying of PDF documents using Hugging Face embeddings, FAISS vector search, and Google Gemini for context-aware question answering.
-
-# Retrieval-Augmented Generation (RAG) Document Intelligence System
-
 An end-to-end Retrieval-Augmented Generation (RAG) application that allows users to interact with large PDF documents through natural language questions. The system extracts text from PDFs, generates semantic embeddings using Hugging Face Sentence Transformers, stores document vectors in FAISS, retrieves relevant context for user queries, and leverages Google Gemini to generate accurate, context-aware responses.
 
 ## Features

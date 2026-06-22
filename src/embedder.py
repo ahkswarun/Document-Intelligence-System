@@ -1,7 +1,11 @@
+import os
+from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from typing import List, Dict
 import numpy as np
 
+load_dotenv()
+os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN")
 
 class Embedder:
     def __init__(self):
@@ -22,7 +26,7 @@ class Embedder:
             for chunk in chunks
         ]
 
-        embeddings = self.model.encode(
+        embeddings = self._get_model().encode(
             texts,
             show_progress_bar=True
         )

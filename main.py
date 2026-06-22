@@ -1,61 +1,57 @@
-import os
-from src.pdf_reader import extract_pdf_text
-from src.chunker import create_chunks
-from src.embedder import Embedder
-from src.vector_store import VectorStore
-from src.retriever import Retriever
-from src.gemini_client import GeminiClient
-from src.rag import RAG
-from src.storage import save_chunks, load_chunks
-
-pdf_path = "data/Kalki.pdf"
-vectorstore_dir = "vectorstore"
-index_path = f"{vectorstore_dir}/book.index"
-chunks_path = f"{vectorstore_dir}/chunks.json"
-
-os.makedirs(vectorstore_dir, exist_ok=True)
-
-pages = extract_pdf_text(pdf_path)
-print(f"Total pages: {len(pages)}")
-
-if os.path.exists(index_path) and os.path.exists(chunks_path):
-    print("Loading existing index...")
-    chunks = load_chunks(chunks_path)
-    vector_store = VectorStore.load(index_path)
-    embeddings = None
-else:
-    print("Building index...")
-    chunks = create_chunks(pages)
-    embedder = Embedder()
-    embeddings = embedder.create_embeddings(chunks)
-    print(embeddings.shape)
-    print(type(embeddings))
-    print(embeddings[0][:10])
-
-    vector_store = VectorStore(embeddings.shape[1])
-    vector_store.add_embeddings(embeddings)
-    save_chunks(chunks, chunks_path)
-    vector_store.save(index_path)
-
-if embeddings is None:
-    embedder = Embedder()
-
-retriever = Retriever(embedder, vector_store, chunks)
-
-gemini = GeminiClient()
-rag = RAG(retriever, gemini)
+import streamlit as st
+from src.rag_setup import get_rag
 
 
-while True:
+st.set_page_config(
+    page_title="Document Intelligence System",
+    page_icon="📚",
+    layout="wide"
+)
 
-    question = input("\nAsk a question: ")
 
-    if question.lower() in ["quit", "thank you"]:
-        print("Goodbye!")
-        break
+@st.cache_resource(show_spinner=False)
+def load_rag():
+    return get_rag()
 
-    answer = rag.ask(question)
 
-    print("\nAnswer:")
-    print(answer)
-    
+try:
+    rag = load_rag()
+except Exception as exc:
+    st.error("Failed to initialize the RAG app. Please check the model and API setup.")
+    st.exception(exc)
+    st.stop()
+
+
+st.title("📚 Document Intelligence System")
+st.markdown(
+    "Ask questions about the Kalki book and get answers grounded in the Book."
+)
+
+question = st.text_input(
+    "Ask a question about the book"
+)
+
+if st.button("Ask"):
+
+    if not question.strip():
+        st.warning("Please enter a question.")
+    else:
+
+        with st.spinner("Searching the document..."):
+
+            result = rag.ask(question)
+
+        st.subheader("Answer")
+        st.success(result["answer"])
+
+        pages = sorted(
+            set(
+                chunk["page"]
+                for chunk in result["sources"]
+            )
+        )
+
+        with st.expander("Sources"):
+
+            for page in pages:
+                st.write(f"📄 Page {page}")

@@ -25,6 +25,9 @@ def create_chunks(
             end = start + chunk_size
 
             chunk_text = text[start:end]
+            if len(chunk_text.strip()) < 100:
+                start += chunk_size - overlap
+                continue
 
             chunks.append(
                 {

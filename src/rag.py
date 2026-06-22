@@ -37,4 +37,7 @@ say:
 'I could not find that information in the book.'
 """
 
-        return self.gemini.generate(prompt)
+        answer = self.gemini.generate(prompt)
+        return {
+        "answer": answer,
+        "sources": chunks}

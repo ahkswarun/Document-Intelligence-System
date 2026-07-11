@@ -26,7 +26,7 @@ class Embedder:
             for chunk in chunks
         ]
 
-        embeddings = self._get_model().encode(
+        embeddings = self.model.encode(
             texts,
             show_progress_bar=True
         )

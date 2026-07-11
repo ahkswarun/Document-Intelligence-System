@@ -24,34 +24,36 @@ except Exception as exc:
 
 st.title("📚 Document Intelligence System")
 st.markdown(
-    "Ask questions about the Kalki book and get answers grounded in the Book."
+    "Ask questions about the **Kalki** book and get answers grounded in the document."
 )
 
 question = st.text_input(
     "Ask a question about the book"
 )
 
+
 if st.button("Ask"):
 
     if not question.strip():
         st.warning("Please enter a question.")
+
     else:
 
         with st.spinner("Searching the document..."):
 
             result = rag.ask(question)
 
+        # Display Answer
         st.subheader("Answer")
-        st.success(result["answer"])
+        st.write(result["answer"])
 
-        pages = sorted(
-            set(
-                chunk["page"]
-                for chunk in result["sources"]
-            )
-        )
+        # Display Sources
+        if result["sources"]:
 
-        with st.expander("Sources"):
+            st.subheader("📚 Sources")
 
-            for page in pages:
-                st.write(f"📄 Page {page}")
+            for source in result["sources"]:
+
+                with st.expander(f"📄 Page {source['page']}"):
+
+                    st.write(source["preview"])

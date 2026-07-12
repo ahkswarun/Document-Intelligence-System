@@ -12,15 +12,17 @@ from src.rag import RAG
 from src.storage import save_chunks, load_chunks
 
 
-def get_rag():
+def get_rag(pdf_path: str):
 
     pdf_path = "data/Kalki.pdf"
 
     vectorstore_dir = "vectorstore"
+    
+    pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]
 
-    index_path = f"{vectorstore_dir}/book.index"
+    index_path = f"{vectorstore_dir}/{pdf_name}.index"
 
-    chunks_path = f"{vectorstore_dir}/chunks.json"
+    chunks_path = f"{vectorstore_dir}/{pdf_name}.json"
 
     os.makedirs(
         vectorstore_dir,

@@ -1,7 +1,5 @@
 # src/rag_setup.py
-
 import os
-
 from src.pdf_reader import extract_pdf_text
 from src.chunker import create_chunks
 from src.embedder import Embedder
